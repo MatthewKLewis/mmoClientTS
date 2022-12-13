@@ -16,7 +16,7 @@ export class HTMLElementManager {
         var lD = document.createElement("div");
         lD.id = "logs-div"
         lD.innerText = "Logs:"
-        hD.setAttribute('style', "padding: 0; margin: 0; position: fixed; top: 1em; right: 1em; text-align: right; color: white; z-index:9999");
+        lD.setAttribute('style', "padding: 0; margin: 0; position: fixed; top: 1em; right: 1em; text-align: right; color: white; z-index:9999");
 
         this.logsDiv =  element && element.appendChild(lD);    
         

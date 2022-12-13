@@ -1,10 +1,11 @@
 import * as THREE from 'three'
 import { InputManager } from '../InputManager/InputManager'
-import { SocketManager } from '../SocketManager/SocketManager'
-import { WorldManager } from '../WorldManager/WorldManager'
+import { EventPacket, MovementPacket, SocketManager, SpawnPacket } from '../SocketManager/SocketManager'
 import { HTMLElementManager } from '../HTMLElementManager/HTMLElementManager'
 import { Player } from '../Player/Player'
-import { Clock, Renderer, Scene } from 'three'
+import { Clock, Light, Renderer, Scene } from 'three'
+
+const NUMBER_OF_TILES = 10
 
 export class GameManager {
 
@@ -12,12 +13,15 @@ export class GameManager {
 
     iM: InputManager
     sM: SocketManager
-    wM: WorldManager
+
     htmlM: HTMLElementManager
-    
-    scene: Scene
+
     renderer: Renderer = new THREE.WebGLRenderer
     clock: Clock = new THREE.Clock
+    
+    scene: Scene
+    grid: any[] = []
+    lights: Light[] = []
     
     timeLastSentGameState: number = 0
     serverSendInterval: number = 0
@@ -35,40 +39,31 @@ export class GameManager {
         //ThreeJS Objects
         this.scene = new THREE.Scene()
         this.canvas = document.querySelector('.webgl')
+
         if (this.canvas) this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas })
         var sizes = { width: window.innerWidth, height: window.innerHeight }
-
         this.renderer.setSize(sizes.width, sizes.height)
+
         //this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-        //Scene
-        this.wM = new WorldManager(this.scene)
-
+        
         // Time
         this.clock = new THREE.Clock()
         this.timeLastSentGameState = 0
         this.serverSendInterval = 0.3
+        
+        this.drawGrid()
         this.tick()
 
         //Subscribe to Socket Events
-        this.sM.spawn$.subscribe((e:any) => {
-            console.log(e)
-            this.player = new Player(e[0], e[1], e[2])
+        this.sM.spawn$.subscribe((sP: SpawnPacket | null) => {
+            if (sP != null) {this.player = new Player(sP) }
         })
-        this.sM.movement$.subscribe((e:any) => {
-            if (e) {
-                //console.log(e);
-            }
+        this.sM.event$.subscribe((eP: EventPacket | null) => {
+            if (eP != null) {console.log(eP) }
         })
-        this.sM.attack$.subscribe((e:any) => {
-            if (e) {
-                //console.log(e);
-            }
-        })
-        this.sM.event$.subscribe((e:any) => {
-            if (e) {
-                //console.log(e);
-            }
+        this.sM.movement$.subscribe((mP: MovementPacket | null) => {
+            if (mP != null) {console.log(mP) }
         })
     }
 
@@ -77,8 +72,9 @@ export class GameManager {
             // Time
             const elapsedTime = this.clock.getElapsedTime()
 
-            // Take user inputs and update position
             if (this.player != null) {
+
+                // Take user inputs and update position
                 if (this.iM.w) { this.player.moveForward() }
                 if (this.iM.s) { this.player.moveBackward() }
                 if (this.iM.d) { this.player.moveRight() }
@@ -101,5 +97,39 @@ export class GameManager {
         }
         // Call tick again on the next frame
         window.requestAnimationFrame(() => { this.tick() })
+    }
+
+    //DRAW SAMPLE WORLD
+    drawGrid() {
+        // Grid Squares
+        for (let x = 0; x < NUMBER_OF_TILES; x++) {
+            for (let z = 0; z < NUMBER_OF_TILES; z++) {
+                var planeGeometry = new THREE.BoxGeometry(10, 1, 10)
+                const planeMaterial = new THREE.MeshLambertMaterial()
+                if ((x+z) % 2 == 0) {
+                    planeMaterial.color = new THREE.Color(0xff5533)
+                } else {
+                    planeMaterial.color = new THREE.Color(0x55ff33)
+                }
+                var plane = new THREE.Mesh(planeGeometry, planeMaterial)
+                plane.position.x = x * 10
+                plane.position.z = z * 10
+                this.grid.push(plane)
+            }
+        }
+        this.scene.add(...this.grid)
+
+        // Lights
+        for (let x = 0; x < 10; x++) {
+            for (let z = 0; z < 10; z++) {
+                const pointLight = new THREE.PointLight(0xffffff, 0.1)
+                pointLight.position.x = x*10
+                pointLight.position.y = 5
+                pointLight.position.z = z*10
+                pointLight.intensity = 0.03
+                this.lights.push(pointLight)
+            }
+        }
+        this.scene.add(...this.lights)
     }
 }

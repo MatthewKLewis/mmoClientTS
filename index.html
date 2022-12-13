@@ -10,12 +10,19 @@
       margin: 0;
       padding: 0;
     }
-
+    
     body {
       overflow: hidden;
     }
 
-    #webgl {
+    #hud {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 999;
+    }
+
+    .webgl {
       position: absolute;
       height: 100%;
       width: 100%;
@@ -24,6 +31,7 @@
 </head>
 
 <body>
+  <div id="hud"></div>
   <canvas class="webgl"></canvas>
   <script src="dist/bundle.js"></script>
 </body>

@@ -1,10 +1,13 @@
 import * as THREE from 'three'
 import { Camera, Material, Mesh, SphereGeometry } from 'three'
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js'
+import { SpawnPacket } from '../SocketManager/SocketManager';
 
 const PLAYER_SPEED = 0.3
 
 export class Player {
+
+    name: string = "ERROR"
 
     x: number = 0;
     y: number = 0;
@@ -16,16 +19,16 @@ export class Player {
     model: Mesh
     controls: PointerLockControls
 
-    constructor(x: number, y: number, z: number) {
-        //CHECK POS
-        console.log(x,y,z)
+    constructor(spawnPacket: SpawnPacket) {
+        // DETAILS
+        this.name = spawnPacket.playerName
 
         // CAMERA
         var sizes = {width: window.innerWidth, height: window.innerHeight}
         this.camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-        this.camera.position.x = Number(x)
-        this.camera.position.y = Number(y)
-        this.camera.position.z = Number(z)
+        this.camera.position.x = Number(spawnPacket.x)
+        this.camera.position.y = Number(spawnPacket.y)
+        this.camera.position.z = Number(spawnPacket.z)
         this.camera.rotation.y = Math.PI
         // this.camera.aspect = sizes.width / sizes.height
         // this.camera.updateProjectionMatrix()
@@ -34,9 +37,9 @@ export class Player {
         this.geo = new THREE.SphereGeometry(2)
         this.material = new THREE.MeshLambertMaterial({color: new THREE.Color(0xff0000)})
         this.model = new THREE.Mesh(this.geo, this.material)
-        this.model.position.x = Number(x)
-        this.model.position.y = Number(y)
-        this.model.position.z = Number(z)
+        this.model.position.x = Number(spawnPacket.x)
+        this.model.position.y = Number(spawnPacket.y)
+        this.model.position.z = Number(spawnPacket.z)
 
         // CONTROLS
         this.controls = new PointerLockControls(this.camera, document.body);
