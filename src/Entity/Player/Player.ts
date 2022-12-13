@@ -17,8 +17,8 @@ export class Player {
     controls: PointerLockControls
 
     constructor(spawnPacket: SpawnPacket) {
-        //CHECK
-        console.log(spawnPacket)
+        // CHECK PACKET
+        //console.log(spawnPacket)
 
         // DETAILS
         this.name = spawnPacket.playerName
@@ -86,5 +86,9 @@ export class Player {
             rotY: this.camera.rotation.y
         }
         return "MOVEMENT|" + tempPos.id +"|"+ tempPos.x +","+ tempPos.y +","+ tempPos.z +","+ tempPos.rotY
+    }
+
+    updatePosition(mP: MovementPacket) {
+        return;
     }
 }

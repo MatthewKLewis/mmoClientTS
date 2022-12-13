@@ -24,7 +24,7 @@ export class Entity {
         this.mesh.position.z = Number(mP.z)
     }
 
-    updatePostition(mP: MovementPacket) {
+    updatePosition(mP: MovementPacket) {
         this.mesh.position.x = mP.x
         this.mesh.position.y = mP.y
         this.mesh.position.z = mP.z

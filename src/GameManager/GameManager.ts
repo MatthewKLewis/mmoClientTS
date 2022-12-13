@@ -28,7 +28,7 @@ export class GameManager {
     serverSendInterval: number = 0
 
     player: Player | null
-    entities: Entity[] = []
+    entities: (Entity | Player)[] = []
 
     constructor() {
         this.player = null
@@ -58,7 +58,10 @@ export class GameManager {
 
         //Subscribe to Socket Events
         this.sM.spawn$.subscribe((sP: SpawnPacket | null) => {
-            if (sP != null) {this.player = new Player(sP) }
+            if (sP != null) {
+                this.player = new Player(sP)
+                this.entities.push(this.player)
+            }
         })
         this.sM.event$.subscribe((eP: EventPacket | null) => {
             if (eP != null) {this.handleSpawnPacket(eP) }
@@ -103,8 +106,8 @@ export class GameManager {
     //DRAW SAMPLE WORLD
     drawGrid() {
         // Grid Squares
-        for (let x = 0; x < NUMBER_OF_TILES; x++) {
-            for (let z = 0; z < NUMBER_OF_TILES; z++) {
+        for (let x = -NUMBER_OF_TILES; x < NUMBER_OF_TILES; x++) {
+            for (let z = -NUMBER_OF_TILES; z < NUMBER_OF_TILES; z++) {
                 var planeGeometry = new THREE.BoxGeometry(10, 1, 10)
                 const planeMaterial = new THREE.MeshLambertMaterial()
                 if ((x+z) % 2 == 0) {
@@ -131,20 +134,28 @@ export class GameManager {
                 this.lights.push(pointLight)
             }
         }
+
+        const ambLight = new THREE.AmbientLight(0xffffff, 0.1)
+        ambLight.position.x = 0
+        ambLight.position.y = 5
+        ambLight.position.z = 0
+        ambLight.intensity = 0.1
+        this.lights.push(ambLight)
+
         this.scene.add(...this.lights)
     }
 
-    //TESTER SOCKET THING
+    //TESTER SOCKET
     handleSpawnPacket(eP: EventPacket) {
         this.scene.add(this.createInertGeometry(eP.x, eP.y, eP.z))
     }
 
     handleMovementPacket(mP: MovementPacket) {        
         var entityFound = false
-        this.entities.forEach((entity: Entity)=>{
+        this.entities.forEach((entity: Entity | Player)=>{
             //find associated entity and update pos
             if (entity.uuid == mP.id) {
-                entity.updatePostition(mP)
+                entity.updatePosition(mP)
                 entityFound = true
             }
         })
