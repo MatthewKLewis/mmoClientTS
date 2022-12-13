@@ -21,6 +21,7 @@ export interface MovementPacket {
     x: number
     y: number
     z: number
+    rotY: number
 }
 
 export interface AttackPacket {
@@ -29,7 +30,6 @@ export interface AttackPacket {
 }
 
 export class SocketManager {
-
     open: boolean = false
     spawn$ = new BehaviorSubject<SpawnPacket | null>(null)
     movement$ = new BehaviorSubject<MovementPacket | null>(null)
@@ -49,7 +49,7 @@ export class SocketManager {
         };  
         this.socket.onmessage = (e: MessageEvent) => {
             if (e.data) {
-                this.dispSocketMessage(e)
+                this.handleSocketMessage(e)
             } else {
                 console.log("PACKET WITHOUT DATA")
             }
@@ -71,16 +71,17 @@ export class SocketManager {
     }
 
     //Takes the raw mesage and formats a queue-bound object out of it.
-    dispSocketMessage(e: MessageEvent) {
+    handleSocketMessage(e: MessageEvent) {
         var messageArray = e.data.split("|")
         var messageHeader = messageArray[0]
 
         switch (messageHeader) {
             case 'SPAWN':
-                var name = messageArray[1]
-                var coords = messageArray[2].split(',')
+                var id = messageArray[1]
+                var name = messageArray[2]
+                var coords = messageArray[3].split(',')
                 var tempSpawn: SpawnPacket = {
-                    id: "1",
+                    id: id,
                     playerName: name,
                     x: Number(coords[0]),
                     y: Number(coords[1]),
@@ -89,21 +90,31 @@ export class SocketManager {
                 this.spawn$.next(tempSpawn)
                 break;
             case 'MOVEMENT':
-                console.log(messageArray)
-                //this.movement$.next("Movement")
+                var id = messageArray[1]
+                var coords = messageArray[2].split(',')
+                var tempMove: MovementPacket = {
+                    id: id,
+                    x: Number(coords[0]),
+                    y: Number(coords[1]),
+                    z: Number(coords[2]),
+                    rotY: Number(coords[3])
+                }
+                this.movement$.next(tempMove)
                 break;
             case 'ATTACK':
                 console.log(messageArray)
                 //this.attack$.next("Attack")
                 break;
             case 'EVENT':
-                var coords = messageArray[1].split(',')
+                var uuid = messageArray[1]
+                var coords = messageArray[2].split(',')
+                var desc = messageArray[3]
                 var tempEvent: EventPacket = {
-                    id: "1",
+                    id: uuid,
                     x: Number(coords[0]),
                     y: Number(coords[1]),
                     z: Number(coords[2]),
-                    description: "Hello",
+                    description: desc,
                 }
                 this.event$.next(tempEvent)
                 break;

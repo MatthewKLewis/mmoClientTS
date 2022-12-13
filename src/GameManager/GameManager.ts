@@ -2,8 +2,9 @@ import * as THREE from 'three'
 import { InputManager } from '../InputManager/InputManager'
 import { EventPacket, MovementPacket, SocketManager, SpawnPacket } from '../SocketManager/SocketManager'
 import { HTMLElementManager } from '../HTMLElementManager/HTMLElementManager'
-import { Player } from '../Player/Player'
+import { Player } from '../Entity/Player/Player'
 import { Clock, Light, Renderer, Scene } from 'three'
+import { Entity } from '../Entity/Entity'
 
 const NUMBER_OF_TILES = 10
 
@@ -27,6 +28,7 @@ export class GameManager {
     serverSendInterval: number = 0
 
     player: Player | null
+    entities: Entity[] = []
 
     constructor() {
         this.player = null
@@ -46,7 +48,6 @@ export class GameManager {
 
         //this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-        
         // Time
         this.clock = new THREE.Clock()
         this.timeLastSentGameState = 0
@@ -60,10 +61,10 @@ export class GameManager {
             if (sP != null) {this.player = new Player(sP) }
         })
         this.sM.event$.subscribe((eP: EventPacket | null) => {
-            if (eP != null) {console.log(eP) }
+            if (eP != null) {this.handleSpawnPacket(eP) }
         })
         this.sM.movement$.subscribe((mP: MovementPacket | null) => {
-            if (mP != null) {console.log(mP) }
+            if (mP != null) {this.handleMovementPacket(mP) }
         })
     }
 
@@ -82,14 +83,14 @@ export class GameManager {
 
                 // Send Gamestate to Server
                 if (elapsedTime > this.timeLastSentGameState + this.serverSendInterval) {
-                    this.sM.send(`${this.player.camera.position.x},
-                        ${this.player.camera.position.y},
-                        ${this.player.camera.position.z},
-                        ${this.player.camera.rotation.y}`
-                    )
+                    this.sM.send(this.player.serializePosition())
                     this.timeLastSentGameState = elapsedTime
                 }
+
                 // Update gamestate from server messages
+                this.entities.forEach((entity: Entity)=>{
+
+                })
 
                 // Render
                 this.renderer.render(this.scene, this.player.camera)
@@ -107,9 +108,9 @@ export class GameManager {
                 var planeGeometry = new THREE.BoxGeometry(10, 1, 10)
                 const planeMaterial = new THREE.MeshLambertMaterial()
                 if ((x+z) % 2 == 0) {
-                    planeMaterial.color = new THREE.Color(0xff5533)
+                    planeMaterial.color = new THREE.Color(0x225555)
                 } else {
-                    planeMaterial.color = new THREE.Color(0x55ff33)
+                    planeMaterial.color = new THREE.Color(0x1aacc)
                 }
                 var plane = new THREE.Mesh(planeGeometry, planeMaterial)
                 plane.position.x = x * 10
@@ -131,5 +132,37 @@ export class GameManager {
             }
         }
         this.scene.add(...this.lights)
+    }
+
+    //TESTER SOCKET THING
+    handleSpawnPacket(eP: EventPacket) {
+        this.scene.add(this.createInertGeometry(eP.x, eP.y, eP.z))
+    }
+
+    handleMovementPacket(mP: MovementPacket) {        
+        var entityFound = false
+        this.entities.forEach((entity: Entity)=>{
+            //find associated entity and update pos
+            if (entity.uuid == mP.id) {
+                entity.updatePostition(mP)
+                entityFound = true
+            }
+        })
+        if (!entityFound) {
+            //spawn entity
+            var tempEntity = new Entity(mP)
+            this.entities.push(tempEntity);
+            this.scene.add(tempEntity.mesh)
+        }
+    }
+
+    createInertGeometry(x: number, y: number, z: number): THREE.Mesh {
+        var testGeo = new THREE.TorusGeometry(1, 1)
+        const testMat = new THREE.MeshLambertMaterial()
+        var testMesh = new THREE.Mesh(testGeo, testMat)
+        testMesh.position.x = x
+        testMesh.position.y = z
+        testMesh.position.z = z
+        return testMesh
     }
 }
