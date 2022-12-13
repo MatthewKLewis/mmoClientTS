@@ -1,3 +1,3 @@
-import { GameManager } from './GameManager/GameManager';
+import { GameManager } from './GameManager/GameManager'
 
 new GameManager();
