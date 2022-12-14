@@ -12,14 +12,14 @@ export class HTMLElementManager {
         //Health
         var hD = document.createElement("div");
         hD.innerText = "Health"
-        hD.setAttribute('style', "padding: 0; margin: 0; position: fixed; top: 1em; left: 1em; text-align: left; color: white; z-index:9999");
+        hD.setAttribute('style', "padding: 0; margin: 0; position: fixed; top: 1em; left: 1em; text-align: left; color: white; z-index:2");
         this.healthDiv = this.hudDiv && this.hudDiv.appendChild(hD);    
         
         //Logs
         var lD = document.createElement("div");
         lD.id = "logs-div"
         lD.innerText = "Logs:"
-        lD.setAttribute('style', "padding: 0; margin: 0; position: fixed; top: 1em; right: 1em; text-align: right; color: white; z-index:9999");
+        lD.setAttribute('style', "padding: 0; margin: 0; position: fixed; top: 1em; right: 1em; text-align: right; color: white; z-index:2");
         this.logsDiv =  this.hudDiv && this.hudDiv.appendChild(lD);
         
         console.log("HTML Manager Built")
@@ -33,7 +33,7 @@ export class HTMLElementManager {
         logsDiv && logsDiv.appendChild(newLog)
     }
 
-    showHideSpinner(show: boolean) {
+    showHideLoader(show: boolean) {
         if (show) {
             this.loadingScreenDiv?.classList.add('show')
             this.loadingScreenDiv?.classList.remove('hide')

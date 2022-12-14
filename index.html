@@ -12,36 +12,35 @@
       font-family: monospace;
     }
     
-    body {
+    body { 
       overflow: hidden;
+    }
+    #loading-screen {
+      position: fixed;
+      top: 1em;
+      left: 1em;
+      width: calc(100vw - 2em);
+      height: calc(100vh - 2em);
+      border-radius: 1em;
+      background-color: rgba(255, 0, 0, 0.5);
+
+      text-align: center;
+
+      z-index: 3;
     }
 
     #hud {
       position: fixed;
       top: 0;
       left: 0;
-      z-index: 999;
+      z-index: 2;
     }
 
-    #loading-screen {
-      position: fixed;
-      top: 100%;
-      left: 100%;
-      width: 16em;
-      height: 4em;
-
-      background-color: black;
-      color: white;
-
-      text-align: center;
-
-      z-index: 999;
-    }
-
-    .webgl {
+    #webgl {
       position: absolute;
       height: 100%;
       width: 100%;
+      z-index: 1;
     }
 
     .show { display: block; }
@@ -53,7 +52,7 @@
   <div id="loading-screen" class="show">...Loading...</div>
   
   <div id="hud"></div>
-  <canvas class="webgl"></canvas>
+  <canvas id="webgl"></canvas>
   <script src="dist/bundle.js"></script>
 </body>
 

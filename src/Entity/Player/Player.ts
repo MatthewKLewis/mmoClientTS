@@ -45,7 +45,7 @@ export class Player {
         this.controls = new PointerLockControls(this.camera, document.body);
 
         // CANVAS
-        var canvasElement = document.querySelector('.webgl')
+        var canvasElement = document.querySelector('#webgl')
         canvasElement && canvasElement.addEventListener('click', () => {this.controls.lock()})
     }
 

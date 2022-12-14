@@ -39,7 +39,7 @@ export class GameManager {
 
         //ThreeJS Objects
         this.scene = new Scene()
-        this.canvas = document.querySelector('.webgl')
+        this.canvas = document.querySelector('#webgl')
 
         if (this.canvas) this.renderer = new WebGLRenderer({ canvas: this.canvas })
         var sizes = { width: window.innerWidth, height: window.innerHeight }
@@ -58,7 +58,7 @@ export class GameManager {
         //Subscribe to Socket Game Events
         this.sM.spawn$.subscribe((sP: SpawnPacket | null) => {
             if (sP != null) {
-                this.htmlM.showHideSpinner(false)
+                this.htmlM.showHideLoader(false)
                 this.player = new Player(sP)
                 this.entities.push(this.player)
             }
@@ -74,13 +74,13 @@ export class GameManager {
         this.sM.error$.subscribe((error: any)=>{
             if (error) {
                 console.log(error)
-                this.htmlM.showHideSpinner(true);
+                this.htmlM.showHideLoader(true);
             }
         })
         this.sM.close$.subscribe((isClosed: boolean)=>{
             if (isClosed) {
                 console.log("Socket is CLosed!")
-                this.htmlM.showHideSpinner(true);
+                this.htmlM.showHideLoader(true);
             }
         })
     }
