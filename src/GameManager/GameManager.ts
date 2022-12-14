@@ -1,9 +1,8 @@
-import * as THREE from 'three'
+import { AmbientLight, BoxGeometry, Clock, Color, Light, Mesh, MeshLambertMaterial, PointLight, Renderer, Scene, TorusGeometry, WebGLRenderer } from 'three'
 import { InputManager } from '../InputManager/InputManager'
 import { EventPacket, MovementPacket, SocketManager, SpawnPacket } from '../SocketManager/SocketManager'
 import { HTMLElementManager } from '../HTMLElementManager/HTMLElementManager'
 import { Player } from '../Entity/Player/Player'
-import { Clock, Light, Renderer, Scene } from 'three'
 import { Entity } from '../Entity/Entity'
 
 const NUMBER_OF_TILES = 10
@@ -17,8 +16,8 @@ export class GameManager {
 
     htmlM: HTMLElementManager
 
-    renderer: Renderer = new THREE.WebGLRenderer
-    clock: Clock = new THREE.Clock
+    renderer: Renderer = new WebGLRenderer
+    clock: Clock = new Clock
     
     scene: Scene
     grid: any[] = []
@@ -39,17 +38,17 @@ export class GameManager {
         this.htmlM = new HTMLElementManager()
 
         //ThreeJS Objects
-        this.scene = new THREE.Scene()
+        this.scene = new Scene()
         this.canvas = document.querySelector('.webgl')
 
-        if (this.canvas) this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas })
+        if (this.canvas) this.renderer = new WebGLRenderer({ canvas: this.canvas })
         var sizes = { width: window.innerWidth, height: window.innerHeight }
         this.renderer.setSize(sizes.width, sizes.height)
 
         //this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
         // Time
-        this.clock = new THREE.Clock()
+        this.clock = new Clock()
         this.timeLastSentGameState = 0
         this.serverSendInterval = 0.3
         
@@ -123,14 +122,14 @@ export class GameManager {
         // Grid Squares
         for (let x = -NUMBER_OF_TILES; x < NUMBER_OF_TILES; x++) {
             for (let z = -NUMBER_OF_TILES; z < NUMBER_OF_TILES; z++) {
-                var planeGeometry = new THREE.BoxGeometry(10, 1, 10)
-                const planeMaterial = new THREE.MeshLambertMaterial()
+                var planeGeometry = new BoxGeometry(10, 1, 10)
+                const planeMaterial = new MeshLambertMaterial()
                 if ((x+z) % 2 == 0) {
-                    planeMaterial.color = new THREE.Color(0x225555)
+                    planeMaterial.color = new Color(0x225555)
                 } else {
-                    planeMaterial.color = new THREE.Color(0x1aacc)
+                    planeMaterial.color = new Color(0x1aacc)
                 }
-                var plane = new THREE.Mesh(planeGeometry, planeMaterial)
+                var plane = new Mesh(planeGeometry, planeMaterial)
                 plane.position.x = x * 10
                 plane.position.z = z * 10
                 this.grid.push(plane)
@@ -141,7 +140,7 @@ export class GameManager {
         // Lights
         for (let x = 0; x < 10; x++) {
             for (let z = 0; z < 10; z++) {
-                const pointLight = new THREE.PointLight(0xffffff, 0.1)
+                const pointLight = new PointLight(0xffffff, 0.1)
                 pointLight.position.x = x*10
                 pointLight.position.y = 5
                 pointLight.position.z = z*10
@@ -150,7 +149,7 @@ export class GameManager {
             }
         }
 
-        const ambLight = new THREE.AmbientLight(0xffffff, 0.1)
+        const ambLight = new AmbientLight(0xffffff, 0.1)
         ambLight.position.x = 0
         ambLight.position.y = 5
         ambLight.position.z = 0
@@ -183,10 +182,10 @@ export class GameManager {
         }
     }
 
-    createInertGeometry(x: number, y: number, z: number): THREE.Mesh {
-        var testGeo = new THREE.TorusGeometry(1, 1)
-        const testMat = new THREE.MeshLambertMaterial()
-        var testMesh = new THREE.Mesh(testGeo, testMat)
+    createInertGeometry(x: number, y: number, z: number): Mesh {
+        var testGeo = new TorusGeometry(1, 1)
+        const testMat = new MeshLambertMaterial()
+        var testMesh = new Mesh(testGeo, testMat)
         testMesh.position.x = x
         testMesh.position.y = z
         testMesh.position.z = z

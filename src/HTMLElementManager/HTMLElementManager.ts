@@ -3,11 +3,11 @@ export class HTMLElementManager {
     hudDiv: HTMLDivElement | null  
     logsDiv: HTMLDivElement | null    
     healthDiv: HTMLDivElement | null  
-    spinnerDiv: HTMLDivElement | null  
+    loadingScreenDiv: HTMLDivElement | null  
 
     constructor() {
         this.hudDiv = document.querySelector("#hud");
-        this.spinnerDiv = document.querySelector("#spinner");
+        this.loadingScreenDiv = document.querySelector("#loading-screen");
 
         //Health
         var hD = document.createElement("div");
@@ -35,11 +35,11 @@ export class HTMLElementManager {
 
     showHideSpinner(show: boolean) {
         if (show) {
-            this.spinnerDiv?.classList.add('show')
-            this.spinnerDiv?.classList.remove('hide')
+            this.loadingScreenDiv?.classList.add('show')
+            this.loadingScreenDiv?.classList.remove('hide')
         } else {
-            this.spinnerDiv?.classList.add('hide')
-            this.spinnerDiv?.classList.remove('show')
+            this.loadingScreenDiv?.classList.add('hide')
+            this.loadingScreenDiv?.classList.remove('show')
         }
     }
 }

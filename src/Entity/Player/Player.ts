@@ -1,5 +1,4 @@
-import * as THREE from 'three'
-import { Camera, Material, Mesh, SphereGeometry } from 'three'
+import { Camera, Color, Material, Mesh, MeshLambertMaterial, PerspectiveCamera, SphereGeometry } from 'three'
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js'
 import { MovementPacket, SpawnPacket } from '../../SocketManager/SocketManager';
 
@@ -26,7 +25,7 @@ export class Player {
 
         // CAMERA
         var sizes = {width: window.innerWidth, height: window.innerHeight}
-        this.camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 300)
+        this.camera = new PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 300)
         this.camera.position.x = Number(spawnPacket.x)
         this.camera.position.y = Number(spawnPacket.y)
         this.camera.position.z = Number(spawnPacket.z)
@@ -35,9 +34,9 @@ export class Player {
         // this.camera.updateProjectionMatrix()
 
         // MODEL
-        this.geo = new THREE.SphereGeometry(2)
-        this.material = new THREE.MeshLambertMaterial({color: new THREE.Color(0xff0000)})
-        this.mesh = new THREE.Mesh(this.geo, this.material)
+        this.geo = new SphereGeometry(2)
+        this.material = new MeshLambertMaterial({color: new Color(0xff0000)})
+        this.mesh = new Mesh(this.geo, this.material)
         this.mesh.position.x = Number(spawnPacket.x)
         this.mesh.position.y = Number(spawnPacket.y)
         this.mesh.position.z = Number(spawnPacket.z)
