@@ -22,15 +22,26 @@
       z-index: 999;
     }
 
+    #spinner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 999;
+    }
+
     .webgl {
       position: absolute;
       height: 100%;
       width: 100%;
     }
+
+    .show { display: block; }
+    .hide { display: none; }
   </style>
 </head>
 
 <body>
+  <div id="spinner" class="show">...</div>
   <div id="hud"></div>
   <canvas class="webgl"></canvas>
   <script src="dist/bundle.js"></script>

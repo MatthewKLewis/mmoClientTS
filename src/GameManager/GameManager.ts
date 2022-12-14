@@ -56,9 +56,10 @@ export class GameManager {
         this.drawGrid()
         this.tick()
 
-        //Subscribe to Socket Events
+        //Subscribe to Socket Game Events
         this.sM.spawn$.subscribe((sP: SpawnPacket | null) => {
             if (sP != null) {
+                this.htmlM.showHideSpinner(false)
                 this.player = new Player(sP)
                 this.entities.push(this.player)
             }
@@ -68,6 +69,20 @@ export class GameManager {
         })
         this.sM.movement$.subscribe((mP: MovementPacket | null) => {
             if (mP != null) {this.handleMovementPacket(mP) }
+        })
+
+        //Subscribe to Socket Error Events
+        this.sM.error$.subscribe((error: any)=>{
+            if (error) {
+                console.log(error)
+                this.htmlM.showHideSpinner(true);
+            }
+        })
+        this.sM.close$.subscribe((isClosed: boolean)=>{
+            if (isClosed) {
+                console.log("Socket is CLosed!")
+                this.htmlM.showHideSpinner(true);
+            }
         })
     }
 
@@ -144,6 +159,7 @@ export class GameManager {
 
         this.scene.add(...this.lights)
     }
+
 
     //TESTER SOCKET
     handleSpawnPacket(eP: EventPacket) {

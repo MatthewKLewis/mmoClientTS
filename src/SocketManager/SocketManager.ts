@@ -31,6 +31,10 @@ export interface AttackPacket {
 
 export class SocketManager {
     open: boolean = false
+
+    error$ = new BehaviorSubject<any>(null)
+    close$ = new BehaviorSubject<boolean>(false)
+
     spawn$ = new BehaviorSubject<SpawnPacket | null>(null)
     movement$ = new BehaviorSubject<MovementPacket | null>(null)
     attack$ = new BehaviorSubject<AttackPacket | null>(null)
@@ -55,17 +59,11 @@ export class SocketManager {
             }
         };
         this.socket.onerror = (e:any) => {
-            console.log("ERROR")
-            console.log(e)
+            this.error$.next(e)
         };
         this.socket.onclose = (e:any) => {
-            console.log("CLOSED!")
             this.open = false
-            if (e.wasClean) {
-                //console.log(e)
-            } else {
-                //console.log(e)
-            }
+            this.close$.next(true)
         };
         console.log("Socket Manager Built")
     }
