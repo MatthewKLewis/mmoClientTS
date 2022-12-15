@@ -22,7 +22,7 @@
       width: calc(100vw - 2em);
       height: calc(100vh - 2em);
       border-radius: 1em;
-      background-color: rgba(255, 0, 0, 0.5);
+      background-color: rgba(41, 89, 161, 0.5);
 
       text-align: center;
 
@@ -34,6 +34,7 @@
       top: 0;
       left: 0;
       z-index: 2;
+      color: white
     }
 
     #webgl {
@@ -51,7 +52,11 @@
 <body>
   <div id="loading-screen" class="show">...Loading...</div>
   
-  <div id="hud"></div>
+  <div id="hud">
+    <div id="name"></div>
+    <div id="health"></div>
+    <div id="xyz"></div>
+  </div>
   <canvas id="webgl"></canvas>
   <script src="dist/bundle.js"></script>
 </body>

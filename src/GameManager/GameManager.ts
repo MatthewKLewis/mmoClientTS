@@ -1,9 +1,10 @@
 import { AmbientLight, BoxGeometry, Clock, Color, Light, Mesh, MeshLambertMaterial, PointLight, Renderer, Scene, TorusGeometry, WebGLRenderer } from 'three'
 import { InputManager } from '../InputManager/InputManager'
-import { EventPacket, MovementPacket, SocketManager, SpawnPacket } from '../SocketManager/SocketManager'
+import { DisconnectPacket, EventPacket, MovementPacket, SocketManager, SpawnPacket } from '../SocketManager/SocketManager'
 import { HTMLElementManager } from '../HTMLElementManager/HTMLElementManager'
 import { Player } from '../Entity/Player/Player'
 import { Entity } from '../Entity/Entity'
+import { returnColorFromInt } from '../Utility/ColorUtility'
 
 const NUMBER_OF_TILES = 10
 
@@ -50,24 +51,23 @@ export class GameManager {
         // Time
         this.clock = new Clock()
         this.timeLastSentGameState = 0
-        this.serverSendInterval = 0.3
+        this.serverSendInterval = 0.1
         
         this.drawGrid()
         this.tick()
 
         //Subscribe to Socket Game Events
         this.sM.spawn$.subscribe((sP: SpawnPacket | null) => {
-            if (sP != null) {
-                this.htmlM.showHideLoader(false)
-                this.player = new Player(sP)
-                this.entities.push(this.player)
-            }
+            if (sP != null) { this.handleSpawnPacket(sP) }
         })
         this.sM.event$.subscribe((eP: EventPacket | null) => {
-            if (eP != null) {this.handleSpawnPacket(eP) }
+            if (eP != null) {this.handleEventPacket(eP) }
         })
         this.sM.movement$.subscribe((mP: MovementPacket | null) => {
             if (mP != null) {this.handleMovementPacket(mP) }
+        })
+        this.sM.disconnect$.subscribe((dP: DisconnectPacket | null) => {
+            if (dP != null) {this.handleDisconnectPacket(dP)}
         })
 
         //Subscribe to Socket Error Events
@@ -87,33 +87,37 @@ export class GameManager {
 
     tick() {
         if (this.sM.open) {
-            // Time
+            // CHECK TIME
             const elapsedTime = this.clock.getElapsedTime()
 
             if (this.player != null) {
 
-                // Take user inputs and update position
+                // CONTROLLER - Take user inputs and update position
                 if (this.iM.w) { this.player.moveForward() }
                 if (this.iM.s) { this.player.moveBackward() }
                 if (this.iM.d) { this.player.moveRight() }
                 if (this.iM.a) { this.player.moveLeft() }
 
-                // Send Gamestate to Server
+                // MODEL COMMS - Send Player State to Server
                 if (elapsedTime > this.timeLastSentGameState + this.serverSendInterval) {
                     this.sM.send(this.player.serializePosition())
                     this.timeLastSentGameState = elapsedTime
                 }
 
-                // Update gamestate from server messages
-                this.entities.forEach((entity: Entity)=>{
+                // VIEW UI
+                this.htmlM.update(
+                    this.player.name, 
+                    this.player.uuid, 
+                    this.player.health, 
+                    this.player.mesh.position.x, 
+                    this.player.mesh.position.y, 
+                    this.player.mesh.position.z
+                )
 
-                })
-
-                // Render
+                // VIEW 3D
                 this.renderer.render(this.scene, this.player.camera)
             }
         }
-        // Call tick again on the next frame
         window.requestAnimationFrame(() => { this.tick() })
     }
 
@@ -124,11 +128,7 @@ export class GameManager {
             for (let z = -NUMBER_OF_TILES; z < NUMBER_OF_TILES; z++) {
                 var planeGeometry = new BoxGeometry(10, 1, 10)
                 const planeMaterial = new MeshLambertMaterial()
-                if ((x+z) % 2 == 0) {
-                    planeMaterial.color = new Color(0x225555)
-                } else {
-                    planeMaterial.color = new Color(0x1aacc)
-                }
+                planeMaterial.color = new Color(returnColorFromInt(x+z))
                 var plane = new Mesh(planeGeometry, planeMaterial)
                 plane.position.x = x * 10
                 plane.position.z = z * 10
@@ -160,35 +160,45 @@ export class GameManager {
     }
 
 
-    //TESTER SOCKET
-    handleSpawnPacket(eP: EventPacket) {
-        this.scene.add(this.createInertGeometry(eP.x, eP.y, eP.z))
+    // ASYNC RESPONSES TO SOCKET EVENTS
+    handleSpawnPacket(sP: SpawnPacket) {
+        console.log("SPAWN PACKET")
+        this.htmlM.showHideLoader(false)
+        this.player = new Player(sP)
+        this.entities.push(this.player)
     }
 
-    handleMovementPacket(mP: MovementPacket) {        
+    handleMovementPacket(mP: MovementPacket) {
         var entityFound = false
         this.entities.forEach((entity: Entity | Player)=>{
             //find associated entity and update pos
-            if (entity.uuid == mP.id) {
+            if (entity.uuid == mP.uuid) {
                 entity.updatePosition(mP)
                 entityFound = true
             }
         })
         if (!entityFound) {
             //spawn entity
+            console.log("SPAWNING from MOVEMENT:" + mP.uuid)
             var tempEntity = new Entity(mP)
             this.entities.push(tempEntity);
             this.scene.add(tempEntity.mesh)
         }
     }
 
-    createInertGeometry(x: number, y: number, z: number): Mesh {
-        var testGeo = new TorusGeometry(1, 1)
-        const testMat = new MeshLambertMaterial()
-        var testMesh = new Mesh(testGeo, testMat)
-        testMesh.position.x = x
-        testMesh.position.y = z
-        testMesh.position.z = z
-        return testMesh
+    handleDisconnectPacket(dP: DisconnectPacket) {
+        console.log(dP)
+        console.log("REMOVING:" + dP.uuid)
+        var objToRemove = this.scene.getObjectByProperty('uuid', dP.uuid)
+        if (objToRemove) {
+            //this.entities = this.entities.splice(entityIndex, 1);
+            objToRemove && this.scene.remove(objToRemove)
+            console.log("REMOVED")
+        }
     }
+
+    handleEventPacket(eP: EventPacket) {
+        //do nothing
+    }
+
 }

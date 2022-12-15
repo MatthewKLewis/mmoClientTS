@@ -1,23 +1,24 @@
-import { Color, Material, Mesh, MeshLambertMaterial, SphereGeometry } from "three";
+import { Color, Material, Mesh, MeshLambertMaterial, SphereGeometry, TorusGeometry } from "three";
 import { MovementPacket } from "../SocketManager/SocketManager";
 
 export class Entity {
     name: string = "ERROR"
     uuid: string = "ERROR"
 
-    geo: SphereGeometry
+    geo: TorusGeometry
     material: Material
     mesh: Mesh
 
     constructor(mP: MovementPacket) {
         // DETAILS
         this.name = "???"
-        this.uuid = mP.id
+        this.uuid = mP.uuid
 
         // MESH
-        this.geo = new SphereGeometry(2)
-        this.material = new MeshLambertMaterial({color: new Color(0xff0000)})
+        this.geo = new TorusGeometry(2)
+        this.material = new MeshLambertMaterial({color: new Color(0x11ff00)})
         this.mesh = new Mesh(this.geo, this.material)
+        this.mesh.uuid = mP.uuid
         this.mesh.position.x = Number(mP.x)
         this.mesh.position.y = Number(mP.y)
         this.mesh.position.z = Number(mP.z)

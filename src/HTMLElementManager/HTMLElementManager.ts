@@ -1,26 +1,19 @@
 export class HTMLElementManager {
 
     hudDiv: HTMLDivElement | null  
-    logsDiv: HTMLDivElement | null    
-    healthDiv: HTMLDivElement | null  
     loadingScreenDiv: HTMLDivElement | null  
+
+    nameDiv: HTMLDivElement | null  
+    healthDiv: HTMLDivElement | null  
+    xyzDiv: HTMLDivElement | null  
 
     constructor() {
         this.hudDiv = document.querySelector("#hud");
         this.loadingScreenDiv = document.querySelector("#loading-screen");
 
-        //Health
-        var hD = document.createElement("div");
-        hD.innerText = "Health"
-        hD.setAttribute('style', "padding: 0; margin: 0; position: fixed; top: 1em; left: 1em; text-align: left; color: white; z-index:2");
-        this.healthDiv = this.hudDiv && this.hudDiv.appendChild(hD);    
-        
-        //Logs
-        var lD = document.createElement("div");
-        lD.id = "logs-div"
-        lD.innerText = "Logs:"
-        lD.setAttribute('style', "padding: 0; margin: 0; position: fixed; top: 1em; right: 1em; text-align: right; color: white; z-index:2");
-        this.logsDiv =  this.hudDiv && this.hudDiv.appendChild(lD);
+        this.nameDiv = document.querySelector("#name");
+        this.healthDiv = document.querySelector("#health");
+        this.xyzDiv = document.querySelector("#xyz");
         
         console.log("HTML Manager Built")
         this.addAdminLog("First Log")
@@ -40,6 +33,18 @@ export class HTMLElementManager {
         } else {
             this.loadingScreenDiv?.classList.add('hide')
             this.loadingScreenDiv?.classList.remove('show')
+        }
+    }
+
+    update(name: string, uuid: string, health: number, x: number, y: number, z: number) {
+        if (this.nameDiv) {
+            this.nameDiv.innerText = name + " " + uuid;
+        }
+        if (this.healthDiv) {
+            this.healthDiv.innerText = health.toString();
+        }
+        if (this.xyzDiv) {
+            this.xyzDiv.innerText = `${x.toFixed(2)},${y.toFixed(2)},${z.toFixed(2)},`;
         }
     }
 }
