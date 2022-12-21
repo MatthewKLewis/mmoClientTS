@@ -1,11 +1,11 @@
-import { Color, Material, Mesh, MeshLambertMaterial, SphereGeometry, TorusGeometry } from "three";
+import { CapsuleGeometry, Color, Material, Mesh, MeshLambertMaterial, SphereGeometry, TorusGeometry } from "three";
 import { MovementPacket } from "../SocketManager/SocketManager";
 
 export class Entity {
     name: string = "ERROR"
     uuid: string = "ERROR"
 
-    geo: TorusGeometry
+    geo: CapsuleGeometry
     material: Material
     mesh: Mesh
 
@@ -15,7 +15,7 @@ export class Entity {
         this.uuid = mP.uuid
 
         // MESH
-        this.geo = new TorusGeometry(2)
+        this.geo = new CapsuleGeometry(2)
         this.material = new MeshLambertMaterial({color: new Color(0x11ff00)})
         this.mesh = new Mesh(this.geo, this.material)
         this.mesh.uuid = mP.uuid

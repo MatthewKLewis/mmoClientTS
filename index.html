@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="./favicon.ico">
   <title>Client</title>
   <style>
     * {
@@ -29,6 +30,17 @@
       z-index: 3;
     }
 
+    #crosshairs {
+      position: fixed;
+      top: calc(50% - 5px);
+      left: calc(50% - 5px);
+      width: 10px;
+      height: 10px;
+      text-align: center;
+      color: white;
+      z-index: 4;
+    }
+
     #hud {
       position: fixed;
       top: 0;
@@ -51,7 +63,7 @@
 
 <body>
   <div id="loading-screen" class="show">...Loading...</div>
-  
+  <div id="crosshairs">.</div>
   <div id="hud">
     <div id="name"></div>
     <div id="health"></div>

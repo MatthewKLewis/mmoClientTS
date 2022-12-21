@@ -1,10 +1,11 @@
-import { AmbientLight, BoxGeometry, Clock, Color, Light, Mesh, MeshLambertMaterial, PointLight, Renderer, Scene, TorusGeometry, WebGLRenderer } from 'three'
+import { AmbientLight, BoxGeometry, Clock, Color, Light, Mesh, MeshLambertMaterial, PointLight, Renderer, Scene, WebGLRenderer } from 'three'
 import { InputManager } from '../InputManager/InputManager'
 import { DisconnectPacket, EventPacket, MovementPacket, SocketManager, SpawnPacket } from '../SocketManager/SocketManager'
 import { HTMLElementManager } from '../HTMLElementManager/HTMLElementManager'
 import { Player } from '../Entity/Player/Player'
 import { Entity } from '../Entity/Entity'
 import { returnColorFromInt } from '../Utility/ColorUtility'
+import { OBJManager } from '../Utility/OBJManager'
 
 const NUMBER_OF_TILES = 10
 
@@ -15,6 +16,7 @@ export class GameManager {
     iM: InputManager
     sM: SocketManager
 
+    objM: OBJManager
     htmlM: HTMLElementManager
 
     renderer: Renderer = new WebGLRenderer
@@ -37,6 +39,7 @@ export class GameManager {
         this.iM = new InputManager()
         this.sM = new SocketManager()
         this.htmlM = new HTMLElementManager()
+        this.objM = new OBJManager()
 
         //ThreeJS Objects
         this.scene = new Scene()

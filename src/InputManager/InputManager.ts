@@ -10,6 +10,7 @@ export class InputManager {
         this.a = false;
         this.s = false;
         this.d = false;
+        document.addEventListener('click', (key)=>{this.click(key)})
         document.addEventListener('keydown', (key)=>{this.keyDown(key)})
         document.addEventListener('keyup', (key)=>{this.keyUp(key)})
         console.log("Input Manager Built")
@@ -47,5 +48,10 @@ export class InputManager {
                 this.d = false
                 break;
         }
+    }
+
+    click(e:any) {
+        //console.log(e)
+        console.log("click")
     }
 }
